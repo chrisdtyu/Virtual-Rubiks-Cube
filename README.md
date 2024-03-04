@@ -2,7 +2,7 @@
 
 ## Instructions
 
-* Install all the requirements in requirements.txt through python pip. To install the kociemba library, a C compiler is required. First, install Visual Studio 2022. From the Visual Studio 2022 installer, install “Desktop development with C++”. Now kociemba can be installed normally via pip.
+* Install all the requirements in requirements.txt through python pip. Please note that in order to install the kociemba library, a C compiler is required. 
   
 * Execute the “run_program.py” file to initiate the program, launching the VPython window featuring a 3x3 Rubik's cube along with the control buttons below. Adjusting settings is possible through the following methods:
   * Hold down the right mouse button within the black box and move the mouse to rotate the cube
