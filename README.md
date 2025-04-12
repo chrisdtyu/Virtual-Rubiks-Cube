@@ -2,8 +2,8 @@
 
 ## Instructions
 
+* Ensure that you're running Python 3.11
 * Install all the requirements in requirements.txt through python pip. Please note that in order to install the kociemba library, a C compiler is required. 
-  
 * Execute the “run_program.py” file to initiate the program, launching the VPython window featuring a 3x3 Rubik's cube along with the control buttons below. Adjusting settings is possible through the following methods:
   * Hold down the right mouse button within the black box and move the mouse to rotate the cube
   * Use the scroll wheel within the black box to zoom in or out on the cube
