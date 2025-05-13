@@ -1,5 +1,10 @@
 # Virtual-Rubik's-Cube
 
+## Demo
+
+Here’s a short [demo video](https://youtu.be/Jz55aOi56Hc) showcasing the key features and functionality of the application. 
+As a fun bonus, the end of the video includes a clip of me solving a physical Rubik’s Cube.
+
 ## Instructions
 
 * Ensure that you're running Python 3.11
