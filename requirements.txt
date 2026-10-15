@@ -1,3 +1,4 @@
 kociemba==1.2.1
 numpy==1.25.1
 vpython==7.6.4
+setuptools<81

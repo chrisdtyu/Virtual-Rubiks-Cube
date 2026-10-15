@@ -6,168 +6,100 @@
 # Code to get solution to the cube.
 
 import kociemba
-from vpython import *
 
-# global variable to check if it's the first run to handle updating the solution shown on screen
-is_first_run = True
+FACE_ORDER = "URFDLB"
 
+FACE_COLORS = {
+    'F': (0, 1, 0),        # green
+    'R': (1, 0, 0),        # red
+    'B': (0, 0, 1),        # blue
+    'L': (1, 0.647, 0),    # orange
+    'U': (1, 1, 1),        # white
+    'D': (1, 1, 0),        # yellow
+}
+SOLVED_CUBE = "".join(face * 9 for face in FACE_ORDER)
 
-def proximity(pos, target):
-    # check if the position is in proximity of the target
-    delta = 0.2
-    result = False
-    if pos.x + delta > target[0] and pos.x - delta < target[0]:
-        if pos.y + delta > target[1] and pos.y - delta < target[1]:
-            if pos.z + delta > target[2] and pos.z - delta < target[2]:
-                result = True
-    return result
+# position of each tile on the solved cube
+_THREE = (-1, 0, 1)
+FACELET_POSITIONS = (
+    [(x, 1.5, z) for z in _THREE for x in _THREE]                          # U
+    + [(1.5, y, z) for y in reversed(_THREE) for z in reversed(_THREE)]    # R
+    + [(x, y, 1.5) for y in reversed(_THREE) for x in _THREE]              # F
+    + [(x, -1.5, z) for z in reversed(_THREE) for x in _THREE]             # D
+    + [(-1.5, y, z) for y in reversed(_THREE) for z in _THREE]             # L
+    + [(x, y, -1.5) for y in reversed(_THREE) for x in reversed(_THREE)]   # B
+)
 
-
-def color_detect(color_value):
-    value = (color_value.x, color_value.y, color_value.z)
-    color_result = None
-    if value == (0, 0, 1):       # blue face
-        color_result = 'F'
-    elif value == (1, 0, 0):     # red face
-        color_result = 'R'
-    elif value == (0, 1, 0):     # green face
-        color_result = 'B'
-    elif value == (1, 0.647, 0): # orange face
-        color_result = 'L'
-    elif value == (1, 1, 0):     # yellow face
-        color_result = 'U'
-    elif value == (1, 1, 1):     # white face
-        color_result = 'D'
-    return color_result
+# rotating the entire cube
+ROTATION_CYCLES = {'x': "FUBD", 'y': "FLBR", 'z': "URDL"}
+ROTATION_MOVES = ["x", "x'", "y", "y'", "z", "z'"]
 
 
-def decode_postion(cube):
-    value = ['0']*54
-
-    # detects the position of each individual tile on the cube
-    for tile in cube:
-        if proximity(tile.pos, (-1, 1.5, -1)): #U1
-            value[0] = color_detect(tile.color)
-        elif proximity(tile.pos, (0, 1.5, -1)): #U2
-            value[1] = color_detect(tile.color)
-        elif proximity(tile.pos, (1, 1.5, -1)): #U3
-            value[2] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1, 1.5, 0)): #U4
-            value[3] = color_detect(tile.color)
-        elif proximity(tile.pos, (0, 1.5, 0)): #U5
-            value[4] = color_detect(tile.color)
-        elif proximity(tile.pos, (1, 1.5, 0)): #U6
-            value[5] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1, 1.5, 1)): #U7
-            value[6] = color_detect(tile.color)
-        elif proximity(tile.pos, (0, 1.5, 1)): #U8
-            value[7] = color_detect(tile.color)
-        elif proximity(tile.pos, (1, 1.5, 1)): #U9
-            value[8] = color_detect(tile.color)
-        elif proximity(tile.pos, (1.5, 1, 1)): #R1
-            value[9] = color_detect(tile.color)
-        elif proximity(tile.pos, (1.5, 1, 0)): #R2
-            value[10] = color_detect(tile.color)
-        elif proximity(tile.pos, (1.5, 1, -1)): #R3
-            value[11] = color_detect(tile.color)
-        elif proximity(tile.pos, (1.5, 0, 1)): #R4
-            value[12] = color_detect(tile.color)
-        elif proximity(tile.pos, (1.5, 0, 0)): #R5
-            value[13] = color_detect(tile.color)
-        elif proximity(tile.pos, (1.5, 0, -1)): #R6
-            value[14] = color_detect(tile.color)
-        elif proximity(tile.pos, (1.5, -1, 1)): #R7
-            value[15] = color_detect(tile.color)
-        elif proximity(tile.pos, (1.5, -1, 0)): #R8
-            value[16] = color_detect(tile.color)
-        elif proximity(tile.pos, (1.5, -1, -1)): #R9
-            value[17] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1, 1, 1.5)): #F1
-            value[18] = color_detect(tile.color)
-        elif proximity(tile.pos, (0, 1, 1.5)): #F2
-            value[19] = color_detect(tile.color)
-        elif proximity(tile.pos, (1, 1, 1.5)): #F3
-            value[20] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1, 0, 1.5)): #F4
-            value[21] = color_detect(tile.color)
-        elif proximity(tile.pos, (0, 0, 1.5)): #F5
-            value[22] = color_detect(tile.color)
-        elif proximity(tile.pos, (1, 0, 1.5)): #F6
-            value[23] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1, -1, 1.5)): #F7
-            value[24] = color_detect(tile.color)
-        elif proximity(tile.pos, (0, -1, 1.5)): #F8
-            value[25] = color_detect(tile.color)
-        elif proximity(tile.pos, (1, -1, 1.5)): #F9
-            value[26] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1, -1.5, 1)): #D1
-            value[27] = color_detect(tile.color)
-        elif proximity(tile.pos, (0, -1.5, 1)): #D2
-            value[28] = color_detect(tile.color)
-        elif proximity(tile.pos, (1, -1.5, 1)): #D3
-            value[29] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1, -1.5, 0)): #D4
-            value[30] = color_detect(tile.color)
-        elif proximity(tile.pos, (0, -1.5, 0)): #D5
-            value[31] = color_detect(tile.color)
-        elif proximity(tile.pos, (1, -1.5, 0)): #D6
-            value[32] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1, -1.5, -1)): #D7
-            value[33] = color_detect(tile.color)
-        elif proximity(tile.pos, (0, -1.5, -1)): #D8
-            value[34] = color_detect(tile.color)
-        elif proximity(tile.pos, (1, -1.5, -1)): #D9
-            value[35] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1.5, 1, -1)): #L1
-            value[36] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1.5, 1, 0)): #L2
-            value[37] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1.5, 1, 1)): #L3
-            value[38] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1.5, 0, -1)): #L4
-            value[39] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1.5, 0, 0)): #L5
-            value[40] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1.5, 0, 1)): #L6
-            value[41] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1.5, -1, -1)): #L7
-            value[42] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1.5, -1, 0)): #L8
-            value[43] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1.5, -1, 1)): #L9
-            value[44] = color_detect(tile.color)
-        elif proximity(tile.pos, (1, 1, -1.5)): #B1
-            value[45] = color_detect(tile.color) 
-        elif proximity(tile.pos, (0, 1, -1.5)): #B2
-            value[46] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1, 1, -1.5)): #B3
-            value[47] = color_detect(tile.color)
-        elif proximity(tile.pos, (1, 0, -1.5)): #B4
-            value[48] = color_detect(tile.color)
-        elif proximity(tile.pos, (0, 0, -1.5)): #B5
-            value[49] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1, 0, -1.5)): #B6
-            value[50] = color_detect(tile.color)
-        elif proximity(tile.pos, (1, -1, -1.5)): #B7
-            value[51] = color_detect(tile.color)
-        elif proximity(tile.pos, (0, -1, -1.5)): #B8
-            value[52] = color_detect(tile.color)
-        elif proximity(tile.pos, (-1, -1, -1.5)): #B9
-            value[53] = color_detect(tile.color)
-    return value
+def proximity(pos, target, delta=0.2):
+    return all(abs(p - t) < delta for p, t in zip((pos.x, pos.y, pos.z), target))
 
 
-def solve(cube):
-    global is_first_run
+def read_colors(tiles):
+    # the colour of the tile at each position
+    colors = []
+    for target in FACELET_POSITIONS:
+        tile = next((t for t in tiles if proximity(t.pos, target)), None)
+        if tile is None:
+            raise ValueError("the cube is not in a fixed position (is a turn still in progress?)")
+        colors.append((tile.color.x, tile.color.y, tile.color.z))
+    return colors
 
-    values = decode_postion(cube)
-    values = "".join(values)
-    solution = kociemba.solve(values)
 
-    if is_first_run:
-        scene.append_to_caption('\nSolution:\n' + solution)
-        is_first_run = False 
-    else:
-        scene.caption = scene.caption.split('\nSolution:')[0] + '\nSolution:\n' + solution
+def read_centers(tiles):
+    colors = read_colors(tiles)
+    return {face: colors[9 * index + 4] for index, face in enumerate(FACE_ORDER)}
 
-    return solution
+
+def decode_position(tiles):
+    colors = read_colors(tiles)
+    face_of_color = {colors[9 * index + 4]: face for index, face in enumerate(FACE_ORDER)}
+    return "".join(face_of_color[color] for color in colors)
+
+
+def rotate_centers(centers, move):
+    cycle = ROTATION_CYCLES[move[0]]
+    step = -1 if move.endswith("'") else 1
+    rotated = dict(centers)
+    for index, face in enumerate(cycle):
+        rotated[cycle[(index + step) % len(cycle)]] = centers[face]
+    return rotated
+
+
+def rotations_to_default(tiles):
+    goal = dict(FACE_COLORS)
+    start = read_centers(tiles)
+    queue = [(start, [])]
+    seen = {tuple(sorted(start.items()))}
+    for centers, path in queue:
+        if centers == goal:
+            return path
+        for move in ROTATION_MOVES:
+            rotated = rotate_centers(centers, move)
+            key = tuple(sorted(rotated.items()))
+            if key not in seen and len(path) < 4:
+                seen.add(key)
+                queue.append((rotated, path + [move]))
+    return []
+
+
+def solve(tiles):
+    # returns the solution as a string of moves (algorithm) 
+    cube = decode_position(tiles)
+    if cube == SOLVED_CUBE:
+        return ""
+    return kociemba.solve(cube)
+
+
+def parse_solution(solution):
+    moves = []
+    for move in solution.split():
+        if move.endswith('2'):
+            moves += [move[0]] * 2
+        else:
+            moves.append(move)
+    return moves
